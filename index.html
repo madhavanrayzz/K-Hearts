@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>K-Hearts Prototype</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    />
+    <style>
+      :root {
+        --pink: #ff7ac2;
+        --pink-dark: #ff4da6;
+        --purple: #7047ff;
+        --purple-deep: #5024d6;
+        --lavender: #f4f0ff;
+        --bg: #0f071c;
+        --surface: rgba(255, 255, 255, 0.08);
+        --text: #fdf8ff;
+        --muted: #b9b3c7;
+        --gradient: linear-gradient(135deg, #ff9dcd, #7d5bff);
+      }
+
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #2d1b4a, #09030f);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text);
+      }
+
+      .device {
+        width: min(420px, 100vw);
+        height: min(890px, 100vh);
+        border-radius: 36px;
+        padding: 18px;
+        background: rgba(7, 2, 20, 0.95);
+        box-shadow: 0 20px 60px rgba(16, 0, 37, 0.8);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .status-bar {
+        display: flex;
+        justify-content: flex-end;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .app-shell {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 28px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        overflow: hidden;
+      }
+
+      .screen {
+        display: none;
+        flex-direction: column;
+        gap: 16px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .screen.active {
+        display: flex;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+      }
+
+      .tagline {
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      .hero {
+        background: var(--gradient);
+        border-radius: 28px;
+        padding: 32px;
+        text-align: center;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: 18px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .hero h1 {
+        font-size: 32px;
+        line-height: 1.2;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 999px;
+        padding: 16px 20px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .btn-primary {
+        background: var(--gradient);
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(125, 91, 255, 0.45);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .btn-tertiary {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+        border-radius: 20px;
+        padding: 10px 16px;
+        font-size: 14px;
+      }
+
+      .btn-chip {
+        padding: 10px 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .btn-chip.active {
+        background: rgba(255, 255, 255, 0.18);
+        border-color: transparent;
+        color: #fff;
+        box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.2);
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      label {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      input,
+      textarea,
+      select {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        padding: 14px 16px;
+        background: rgba(12, 4, 32, 0.8);
+        color: #fff;
+        font-size: 15px;
+        font-family: inherit;
+      }
+
+      textarea {
+        min-height: 90px;
+        resize: none;
+      }
+
+      .social-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .surface-card {
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 24px;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .photo-upload {
+        height: 120px;
+        border-radius: 20px;
+        border: 1px dashed rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .card-stack {
+        position: relative;
+        height: 360px;
+        border-radius: 28px;
+        overflow: hidden;
+      }
+
+      .profile-card {
+        position: absolute;
+        inset: 0;
+        border-radius: 28px;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 24px;
+        color: #fff;
+        box-shadow: 0 25px 50px rgba(5, 0, 28, 0.8);
+        transition: transform 0.3s ease;
+      }
+
+      .profile-card:nth-child(1) {
+        transform: rotate(-2deg) translateY(8px);
+        opacity: 0.6;
+      }
+
+      .profile-card:nth-child(2) {
+        transform: rotate(0deg);
+        z-index: 3;
+      }
+
+      .profile-card:nth-child(3) {
+        transform: rotate(2deg) translateY(-8px);
+        opacity: 0.8;
+      }
+
+      .profile-meta {
+        background: rgba(0, 0, 0, 0.36);
+        border-radius: 20px;
+        padding: 12px 16px;
+        backdrop-filter: blur(4px);
+      }
+
+      .swipe-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .swipe-actions button {
+        flex: 1;
+        border-radius: 999px;
+        padding: 14px;
+        font-weight: 600;
+        border: none;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      .swipe-actions .dislike {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .swipe-actions .like {
+        background: var(--gradient);
+      }
+
+      .swipe-actions .superlike {
+        background: radial-gradient(circle at top, #7ad8ff, #4e98ff);
+      }
+
+      .chat-header {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+      }
+
+      .avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 18px;
+        background: var(--gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+      }
+
+      .chat-thread {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .bubble {
+        max-width: 80%;
+        padding: 12px 16px;
+        border-radius: 20px;
+        font-size: 15px;
+      }
+
+      .bubble.me {
+        align-self: flex-end;
+        background: var(--gradient);
+      }
+
+      .bubble.them {
+        align-self: flex-start;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .message-input {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .message-input input {
+        flex: 1;
+        border-radius: 999px;
+      }
+
+      .slider-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: #ff82c6;
+      }
+
+      .safety-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .tab-bar {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        padding-top: 8px;
+      }
+
+      .tab-bar button {
+        border: none;
+        border-radius: 18px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .tab-bar button.active {
+        background: rgba(255, 255, 255, 0.14);
+        color: #fff;
+      }
+
+      .ai-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .icebreaker {
+        font-size: 16px;
+        line-height: 1.5;
+        color: #fff;
+      }
+
+      @media (max-height: 740px) {
+        .device {
+          height: 100vh;
+          border-radius: 0;
+        }
+
+        .app-shell {
+          padding: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="device">
+      <div class="status-bar">10:24 • LTE • 92%</div>
+      <div class="app-shell">
+        <section class="screen active" id="screen-splash">
+          <div class="hero">
+            <h1>K-Hearts</h1>
+            <p class="tagline">Find your meaningful connection</p>
+          </div>
+          <p class="tagline">
+            A modern, human-first dating experience with safety and style at its core.
+          </p>
+          <div class="cta-row">
+            <button class="btn btn-primary" data-target="screen-auth">Sign Up</button>
+            <button class="btn btn-secondary" data-target="screen-auth">Login</button>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-auth">
+          <h2>Welcome to K-Hearts</h2>
+          <p class="tagline">Create an account or jump back into your chats.</p>
+          <div class="input-group">
+            <label for="name">Name</label>
+            <input id="name" placeholder="Amelia Hart" />
+          </div>
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input id="email" type="email" placeholder="amelia@khearts.com" />
+          </div>
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input id="password" type="password" placeholder="••••••••" />
+          </div>
+          <div class="cta-row">
+            <button class="btn btn-primary">Sign Up</button>
+            <button class="btn btn-secondary">Login</button>
+          </div>
+          <div class="social-buttons">
+            <button class="btn btn-tertiary">Continue with Google</button>
+            <button class="btn btn-tertiary">Continue with Facebook</button>
+          </div>
+          <small>Already have an account? <strong>Log in</strong></small>
+        </section>
+
+        <section class="screen" id="screen-profile">
+          <h2>Profile Setup</h2>
+          <div class="surface-card">
+            <div class="photo-upload">Upload profile photo</div>
+            <div class="input-group">
+              <label>Full Name</label>
+              <input placeholder="Amelia Hart" />
+            </div>
+            <div class="input-group">
+              <label>Age</label>
+              <input type="number" placeholder="29" />
+            </div>
+            <div class="input-group">
+              <label>Bio</label>
+              <textarea placeholder="Curious traveler. Coffee geek. Looking for genuine vibes."></textarea>
+            </div>
+            <div class="input-group">
+              <label>Location</label>
+              <input placeholder="Los Angeles, CA • Use GPS" />
+            </div>
+            <div class="input-group">
+              <label>Interests</label>
+              <div class="tags">
+                <button class="btn-chip active">Hiking</button>
+                <button class="btn-chip">Live Music</button>
+                <button class="btn-chip active">Art Museums</button>
+                <button class="btn-chip">Foodie</button>
+                <button class="btn-chip">Wellness</button>
+              </div>
+            </div>
+            <button class="btn btn-primary">Save</button>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-swipe">
+          <h2>Discover</h2>
+          <div class="card-stack">
+            <article
+              class="profile-card"
+              style="background-image: url('https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?auto=format&fit=crop&w=800&q=80')"
+            >
+              <div class="profile-meta">
+                <strong>Riya, 27 • 3 km</strong>
+                <p>Poetry addict. Sunrise lover. Let’s chase the next art show.</p>
+              </div>
+            </article>
+            <article
+              class="profile-card"
+              style="background-image: url('https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=800&q=80')"
+            >
+              <div class="profile-meta">
+                <strong>Leo, 29 • 5 km</strong>
+                <p>Chef in progress. Guitar on weekends. Swipe right if you love dogs.</p>
+              </div>
+            </article>
+            <article
+              class="profile-card"
+              style="background-image: url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=800&q=80')"
+            >
+              <div class="profile-meta">
+                <strong>Lena, 26 • 2 km</strong>
+                <p>Brand strategist. Pilates devotee. Let’s talk travel plans.</p>
+              </div>
+            </article>
+          </div>
+          <div class="swipe-actions">
+            <button class="dislike">✕ Dislike</button>
+            <button class="superlike">★ Super Like</button>
+            <button class="like">♥ Like</button>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-chat">
+          <h2>Messages</h2>
+          <div class="chat-header">
+            <div class="avatar">AH</div>
+            <div class="avatar">RL</div>
+            <div class="avatar">JD</div>
+            <div class="avatar">MT</div>
+          </div>
+          <div class="surface-card">
+            <div class="chat-thread">
+              <div class="bubble them">Hey Amelia! How was the art fair you mentioned?</div>
+              <div class="bubble me">It was stunning! Found a new favorite painter.</div>
+              <div class="bubble them">
+                Love that. Want to check out the pop-up gallery this weekend?
+              </div>
+            </div>
+            <div class="message-input">
+              <input placeholder="Type a message or drop an emoji" />
+              <button class="btn btn-primary" style="padding: 12px 18px">Send</button>
+            </div>
+            <button class="btn btn-tertiary">✨ Suggest an AI icebreaker</button>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-preferences">
+          <h2>Preferences</h2>
+          <div class="surface-card">
+            <div class="input-group">
+              <label>Age Range: 24 - 36</label>
+              <div class="slider-group">
+                <input type="range" min="18" max="55" value="24" />
+                <input type="range" min="18" max="55" value="36" />
+              </div>
+            </div>
+            <div class="input-group">
+              <label>Distance: up to 25 km</label>
+              <input type="range" min="1" max="100" value="25" />
+            </div>
+            <div class="input-group">
+              <label>Interests</label>
+              <div class="tags">
+                <button class="btn-chip active">Travel</button>
+                <button class="btn-chip">Yoga</button>
+                <button class="btn-chip active">Indie Films</button>
+                <button class="btn-chip">Street Food</button>
+                <button class="btn-chip">Gaming</button>
+              </div>
+            </div>
+            <button class="btn btn-primary">Save Preferences</button>
+            <div class="cta-row">
+              <button class="btn btn-secondary" data-target="screen-safety">
+                Safety & Reporting
+              </button>
+              <button class="btn btn-tertiary" data-target="screen-icebreaker">
+                AI Icebreakers
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-safety">
+          <h2>Safety & Support</h2>
+          <div class="surface-card">
+            <p class="tagline">
+              Stay in control. Every report is reviewed by our trust & safety team.
+            </p>
+            <div class="safety-actions">
+              <button class="btn btn-primary">Report User</button>
+              <button class="btn btn-secondary">Block User</button>
+            </div>
+            <div>
+              <h3>Tips</h3>
+              <ul>
+                <li>Meet in public places for first dates.</li>
+                <li>Keep personal info private until you trust the match.</li>
+                <li>Use our in-app chat to stay protected.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-icebreaker">
+          <h2>AI Icebreaker</h2>
+          <div class="ai-card">
+            <p class="tagline">Smart prompts inspired by both profiles.</p>
+            <div class="icebreaker">
+              “If we planned a spontaneous day trip, which city would you pick and why?”
+            </div>
+            <div class="cta-row">
+              <button class="btn btn-primary">Send to Chat</button>
+              <button class="btn btn-secondary">Refresh</button>
+            </div>
+          </div>
+        </section>
+
+        <nav class="tab-bar">
+          <button class="active" data-target="screen-splash">Home</button>
+          <button data-target="screen-swipe">Swipe</button>
+          <button data-target="screen-chat">Matches</button>
+          <button data-target="screen-profile">Profile</button>
+          <button data-target="screen-preferences">Settings</button>
+        </nav>
+      </div>
+    </div>
+    <script>
+      const screens = document.querySelectorAll(".screen");
+      const navButtons = document.querySelectorAll("[data-target]");
+
+      function showScreen(id) {
+        screens.forEach((screen) => {
+          screen.classList.toggle("active", screen.id === id);
+        });
+        navButtons.forEach((btn) =>
+          btn.classList.toggle("active", btn.dataset.target === id)
+        );
+        document
+          .querySelectorAll(`button[data-target="${id}"]`)
+          .forEach((btn) => btn.classList.add("active"));
+      }
+
+      navButtons.forEach((btn) => {
+        btn.addEventListener("click", () => showScreen(btn.dataset.target));
+      });
+    </script>
+  </body>
+</html>
+
